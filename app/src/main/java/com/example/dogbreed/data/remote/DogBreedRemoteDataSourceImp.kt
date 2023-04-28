@@ -1,6 +1,7 @@
 package com.example.dogbreed.data.remote
 
 import com.example.dogbreed.data.remote.model.AllBreedsResponse
+import com.example.dogbreed.data.remote.model.BreedImageResponse
 import com.example.dogbreed.data.utils.Result
 import com.example.dogbreed.data.utils.asResult
 import kotlinx.coroutines.flow.Flow
@@ -13,5 +14,9 @@ class DogBreedRemoteDataSourceImp @Inject constructor(
 
     override fun getAllDogBreeds(): Flow<Result<AllBreedsResponse>> = flow {
         emit(dogBreedService.getAllBreeds())
+    }.asResult()
+
+    override fun getBreedImage(breedName: String): Flow<Result<BreedImageResponse>> = flow {
+        emit(dogBreedService.getBreedImages(breedName))
     }.asResult()
 }

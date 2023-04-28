@@ -4,6 +4,7 @@ import com.example.dogbreed.data.remote.DogBreedRemoteDataSource
 import com.example.dogbreed.data.remote.DogBreedRemoteDataSourceImp
 import com.example.dogbreed.data.remote.DogBreedService
 import com.example.dogbreed.data.remote.model.AllBreedsResponse
+import com.example.dogbreed.data.remote.model.BreedImageResponse
 import com.example.dogbreed.data.utils.Result
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.toList
@@ -25,10 +26,7 @@ class DogBreedRemoteDataSourceTest {
         server = MockWebServer()
         server.start()
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl(server.url("/"))
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+        val retrofit = Retrofit.Builder().baseUrl(server.url("/")).addConverterFactory(GsonConverterFactory.create()).build()
 
         dataSource = DogBreedRemoteDataSourceImp(
             retrofit.create(DogBreedService::class.java)
@@ -43,9 +41,7 @@ class DogBreedRemoteDataSourceTest {
     @Test
     fun getAllDogBreed_Success() = runBlocking {
         // Set up a mocked response for the "/list/all" endpoint
-        val response = MockResponse()
-            .setResponseCode(200)
-            .setBody(provideDogBreedResponse())
+        val response = MockResponse().setResponseCode(200).setBody(provideDogBreedResponse())
         server.enqueue(response)
 
         // Call the getAllDogBreeds method on the remote data source
@@ -58,12 +54,10 @@ class DogBreedRemoteDataSourceTest {
 
         // Verify that the correct response was received
         assertEquals(
-            dogBreeds, listOf(
-                Result.Loading,
-                Result.Success(
+            listOf(
+                Result.Loading, Result.Success(
                     AllBreedsResponse(
-                        "success",
-                        hashMapOf<String, List<String>>(
+                        "success", hashMapOf<String, List<String>>(
                             "affenpinscher" to listOf(),
                             "sharpei" to listOf(),
                             "australian" to listOf("shepherd"),
@@ -72,15 +66,14 @@ class DogBreedRemoteDataSourceTest {
                         )
                     )
                 )
-            )
+            ), dogBreeds
         )
     }
 
     @Test
     fun getAllDogBreed_Error() = runBlocking {
         // Set up a mocked response for the "/list/all" endpoint
-        val response = MockResponse()
-            .setResponseCode(404)
+        val response = MockResponse().setResponseCode(404)
         server.enqueue(response)
 
         // Call the getAllDogBreeds method on the remote data source
@@ -92,9 +85,61 @@ class DogBreedRemoteDataSourceTest {
         assertEquals("/list/all", request.path)
 
         // Verify that the correct response was received
-        assertEquals(dogBreeds.size, 2)
-        assertEquals(dogBreeds[0], Result.Loading)
+        assertEquals(2, dogBreeds.size)
+        assertEquals(Result.Loading, dogBreeds[0])
         assert(dogBreeds[1] is Result.Error)
+    }
+
+    @Test
+    fun getBreedImage_Success() = runBlocking {
+        // Set up a mocked response for the "/{breedName}/images" endpoint
+        val response = MockResponse().setResponseCode(200).setBody(provideDogBreedImage())
+        server.enqueue(response)
+
+        // Call the breedImages method on the remote data source
+        val breedImages = dataSource.getBreedImage("dog").toList()
+
+        // Verify that the correct request was sent
+        val request = server.takeRequest()
+        assertEquals("GET", request.method)
+        assertEquals("/dog/images", request.path)
+
+        // Verify that the correct response was received
+        assertEquals(
+            listOf(
+                Result.Loading, Result.Success(
+                    BreedImageResponse(
+                        listOf(
+                            "https://images.dog.ceo/breeds/hound-afghan/n02088094_1003.jpg",
+                            "https://images.dog.ceo/breeds/hound-afghan/n02088094_10263.jpg",
+                        ), "success"
+                    )
+                )
+            ), breedImages
+        )
+    }
+
+    @Test
+    fun getBreedImage_Error() = runBlocking {
+        // Set up a mocked response for the "/{breedName}/images" endpoint
+        val response = MockResponse().setResponseCode(404)
+        server.enqueue(response)
+
+        // Call the breedImages method on the remote data source
+        val breedNameResult = dataSource.getBreedImage("dog").toList()
+
+        // Verify that the correct request was sent
+        val request = server.takeRequest()
+        assertEquals("GET", request.method)
+        assertEquals("/dog/images", request.path)
+
+        // Verify that the correct response was received
+        assertEquals(2, breedNameResult.size)
+        assertEquals(
+            Result.Loading,
+            breedNameResult[0]
+        )
+        assert(breedNameResult[1] is Result.Error)
     }
 
     private fun provideDogBreedResponse() = """
@@ -116,4 +161,14 @@ class DogBreedRemoteDataSourceTest {
             "status": "success" 
         }
         """
+
+    private fun provideDogBreedImage() = """
+        {
+            "message": [ 
+                "https://images.dog.ceo/breeds/hound-afghan/n02088094_1003.jpg",
+                "https://images.dog.ceo/breeds/hound-afghan/n02088094_10263.jpg"
+            ], 
+            "status": "success"
+        }
+    """.trimIndent()
 }
