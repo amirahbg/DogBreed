@@ -21,4 +21,15 @@ class DogBreedRepositoryImp @Inject constructor(
                 }
             }
     }
+
+    override fun fetchBreedImages(breedName: String): Flow<Result<List<String>>> {
+        return dogBreedRemoteDataSource.getBreedImage(breedName)
+            .map { data ->
+                when (data) {
+                    Result.Loading -> Result.Loading
+                    is Result.Success -> Result.Success(data.data.imageUrls)
+                    is Result.Error -> Result.Error(data.exception)
+                }
+            }
+    }
 }
