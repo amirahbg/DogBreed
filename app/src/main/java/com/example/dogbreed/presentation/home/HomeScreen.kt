@@ -1,4 +1,4 @@
-package com.example.dogbreed.data.presentation.home
+package com.example.dogbreed.presentation.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -25,6 +25,9 @@ fun HomeScreen(
         content = {
             when (val uiStateValue = uiState.value) {
                 is HomeUiModel.Success -> DogBreeds(
+                    onItemClicked = { breedName ->
+                        navController.navigate("breed-image/$breedName")
+                    },
                     dogBreeds = uiStateValue.data,
                     modifier = Modifier.padding(8.dp)
                 )
@@ -59,6 +62,7 @@ fun Error(message: String?) {
 
 @Composable
 fun DogBreeds(
+    onItemClicked: (breedName: String) -> Unit,
     dogBreeds: HashMap<String, List<String>>,
     modifier: Modifier = Modifier
 ) {
@@ -70,19 +74,18 @@ fun DogBreeds(
             dogBreeds.forEach { (title, breeds) ->
                 if (breeds.isNotEmpty()) {
                     item {
-                        DogBreedHeader(header = title)
+                        DogBreedHeader(
+                            header = title,
+                            onItemClicked = onItemClicked
+                        )
                     }
                     items(breeds) { breedName ->
                         DogBreedItem(
                             dogBreedName = breedName,
                             modifier = Modifier.padding(start = 24.dp),
-                            onItemClicked = {
-                                TODO("implement on dog breed clicked")
-                            },
                         )
                     }
                 }
-
             }
         }
     }
@@ -91,12 +94,10 @@ fun DogBreeds(
 @Composable
 private fun DogBreedItem(
     dogBreedName: String,
-    onItemClicked: (breedName: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = modifier
-            .clickable { onItemClicked(dogBreedName) },
+        modifier = modifier,
         color = MaterialTheme.colorScheme.tertiary,
         shape = MaterialTheme.shapes.extraSmall
     ) {
@@ -109,9 +110,14 @@ private fun DogBreedItem(
 }
 
 @Composable
-private fun DogBreedHeader(header: String, modifier: Modifier = Modifier) {
+fun DogBreedHeader(
+    header: String,
+    onItemClicked: (breedName: String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Surface(
-        modifier = modifier,
+        modifier = modifier
+            .clickable { onItemClicked(header) },
         color = MaterialTheme.colorScheme.primary,
         shape = MaterialTheme.shapes.extraSmall
     ) {

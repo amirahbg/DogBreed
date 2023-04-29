@@ -1,4 +1,4 @@
-package com.example.dogbreed.data.presentation.home
+package com.example.dogbreed.presentation.home
 
 sealed class HomeUiModel {
     data class Success(val data: HashMap<String, List<String>>) : HomeUiModel()

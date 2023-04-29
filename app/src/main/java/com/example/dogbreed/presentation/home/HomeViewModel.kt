@@ -1,4 +1,4 @@
-package com.example.dogbreed.data.presentation.home
+package com.example.dogbreed.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -40,7 +40,7 @@ class DogBreedRemoteDataSourceTest {
 
     @Test
     fun getAllDogBreed_Success() = runBlocking {
-        // Set up a mocked response for the "/list/all" endpoint
+        // Set up a mocked response for the "/breeds/list/all" endpoint
         val response = MockResponse().setResponseCode(200).setBody(provideDogBreedResponse())
         server.enqueue(response)
 
@@ -50,7 +50,7 @@ class DogBreedRemoteDataSourceTest {
         // Verify that the correct request was sent
         val request = server.takeRequest()
         assertEquals("GET", request.method)
-        assertEquals("/list/all", request.path)
+        assertEquals("/breeds/list/all", request.path)
 
         // Verify that the correct response was received
         assertEquals(
@@ -72,7 +72,7 @@ class DogBreedRemoteDataSourceTest {
 
     @Test
     fun getAllDogBreed_Error() = runBlocking {
-        // Set up a mocked response for the "/list/all" endpoint
+        // Set up a mocked response for the "/breeds/list/all" endpoint
         val response = MockResponse().setResponseCode(404)
         server.enqueue(response)
 
@@ -82,7 +82,7 @@ class DogBreedRemoteDataSourceTest {
         // Verify that the correct request was sent
         val request = server.takeRequest()
         assertEquals("GET", request.method)
-        assertEquals("/list/all", request.path)
+        assertEquals("/breeds/list/all", request.path)
 
         // Verify that the correct response was received
         assertEquals(2, dogBreeds.size)
@@ -92,7 +92,7 @@ class DogBreedRemoteDataSourceTest {
 
     @Test
     fun getBreedImage_Success() = runBlocking {
-        // Set up a mocked response for the "/{breedName}/images" endpoint
+        // Set up a mocked response for the "/breed/{breedName}/images" endpoint
         val response = MockResponse().setResponseCode(200).setBody(provideDogBreedImage())
         server.enqueue(response)
 
@@ -102,7 +102,7 @@ class DogBreedRemoteDataSourceTest {
         // Verify that the correct request was sent
         val request = server.takeRequest()
         assertEquals("GET", request.method)
-        assertEquals("/dog/images", request.path)
+        assertEquals("/breed/dog/images", request.path)
 
         // Verify that the correct response was received
         assertEquals(
@@ -121,7 +121,7 @@ class DogBreedRemoteDataSourceTest {
 
     @Test
     fun getBreedImage_Error() = runBlocking {
-        // Set up a mocked response for the "/{breedName}/images" endpoint
+        // Set up a mocked response for the "/breed/{breedName}/images" endpoint
         val response = MockResponse().setResponseCode(404)
         server.enqueue(response)
 
@@ -131,7 +131,7 @@ class DogBreedRemoteDataSourceTest {
         // Verify that the correct request was sent
         val request = server.takeRequest()
         assertEquals("GET", request.method)
-        assertEquals("/dog/images", request.path)
+        assertEquals("/breed/dog/images", request.path)
 
         // Verify that the correct response was received
         assertEquals(2, breedNameResult.size)

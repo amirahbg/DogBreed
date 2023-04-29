@@ -1,7 +1,7 @@
 package com.example.dogbreed
 
-import com.example.dogbreed.data.presentation.home.HomeUiModel
-import com.example.dogbreed.data.presentation.home.HomeViewModel
+import com.example.dogbreed.presentation.home.HomeUiModel
+import com.example.dogbreed.presentation.home.HomeViewModel
 import com.example.dogbreed.data.repository.DogBreedRepository
 import com.example.dogbreed.data.utils.*
 import io.mockk.every
